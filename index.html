@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus ERP — Sistema de Gestión Empresarial</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f9f9f8; --surface: #ffffff; --border: #e5e5e3; --text: #1a1a1a; --muted: #8a8a8a;
+      --accent: #2563eb; --accent-light: #eff6ff; --green: #16a34a; --green-light: #f0fdf4;
+      --red: #dc2626; --red-light: #fef2f2; --amber: #d97706; --amber-light: #fffbeb;
+      --radius: 8px; --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; display: flex; min-height: 100vh; }
+    .sidebar { width: 220px; min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 0; position: fixed; top: 0; left: 0; }
+    .logo { padding: 0 20px 24px; border-bottom: 1px solid var(--border); }
+    .logo-mark { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+    .logo-mark span { color: var(--accent); }
+    .logo-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .nav { padding: 16px 12px; flex: 1; }
+    .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 0 8px; margin-bottom: 6px; margin-top: 16px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; color: var(--muted); cursor: pointer; transition: background 0.15s, color 0.15s; font-size: 13.5px; }
+    .nav-item:hover { background: var(--bg); color: var(--text); }
+    .nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 500; }
+    .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+    .user-pill { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: white; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .user-info .name { font-size: 13px; font-weight: 500; }
+    .user-info .role { font-size: 11px; color: var(--muted); }
+    .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
+    .topbar { height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 10; }
+    .page-title { font-size: 15px; font-weight: 600; }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .btn { padding: 6px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: opacity 0.15s; }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .search { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; font-size: 13px; color: var(--muted); width: 200px; }
+    .content { padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 10px; }
+    .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -1px; }
+    .stat-change { font-size: 12px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+    .stat-change.up { color: var(--green); }
+    .stat-change.down { color: var(--red); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 13.5px; font-weight: 600; }
+    .card-action { font-size: 12px; color: var(--accent); cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 10px 20px; border-bottom: 1px solid var(--border); }
+    td { padding: 12px 20px; font-size: 13.5px; border-bottom: 1px solid var(--border); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg); }
+    .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+    .badge-green { background: var(--green-light); color: var(--green); }
+    .badge-amber { background: var(--amber-light); color: var(--amber); }
+    .badge-red { background: var(--red-light); color: var(--red); }
+    .badge-blue { background: var(--accent-light); color: var(--accent); }
+    .chart-wrap { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .chart-bar-row { display: flex; align-items: center; gap: 12px; font-size: 12.5px; }
+    .chart-bar-label { width: 72px; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .chart-bar-track { flex: 1; height: 8px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+    .chart-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+    .chart-bar-val { width: 44px; text-align: right; font-weight: 600; color: var(--text); }
+    .activity-list { padding: 8px 0; }
+    .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .activity-text { font-size: 13px; color: var(--text); }
+    .activity-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .progress-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+    .progress-meta { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+    .progress-name { font-weight: 500; }
+    .progress-pct { color: var(--muted); }
+    .progress-track { height: 5px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">Ne<span>x</span>us</div>
+      <div class="logo-sub">Sistema de Gestión Empresarial</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">General</div>
+      <div class="nav-item active"><span class="nav-icon">▣</span> Dashboard</div>
+      <div class="nav-item"><span class="nav-icon">◈</span> Proyectos</div>
+      <div class="nav-item"><span class="nav-icon">◎</span> Tareas</div>
+      <div class="nav-label">Empresa</div>
+      <div class="nav-item"><span class="nav-icon">◷</span> Finanzas</div>
+      <div class="nav-item"><span class="nav-icon">◑</span> Recursos Humanos</div>
+      <div class="nav-item"><span class="nav-icon">◐</span> Clientes (CRM)</div>
+      <div class="nav-item"><span class="nav-icon">◻</span> Inventario</div>
+      <div class="nav-label">Sistema</div>
+      <div class="nav-item"><span class="nav-icon">◌</span> Reportes</div>
+      <div class="nav-item"><span class="nav-icon">◯</span> Configuración</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-pill">
+        <div class="avatar">AL</div>
+        <div class="user-info">
+          <div class="name">Ana Lima</div>
+          <div class="role">Administradora</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <span class="page-title">Dashboard</span>
+      <div class="topbar-actions">
+        <div class="search">⚲ Buscar...</div>
+        <button class="btn btn-ghost">Exportar</button>
+        <button class="btn btn-primary">+ Nuevo proyecto</button>
+      </div>
+    </header>
+    <div class="content">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Ingresos del mes</div><div class="stat-value">$84,210</div><div class="stat-change up">▲ 12.4% vs mes anterior</div></div>
+        <div class="stat-card"><div class="stat-label">Proyectos activos</div><div class="stat-value">24</div><div class="stat-change up">▲ 3 nuevos esta semana</div></div>
+        <div class="stat-card"><div class="stat-label">Empleados activos</div><div class="stat-value">138</div><div class="stat-change down">▼ 2 bajas este mes</div></div>
+        <div class="stat-card"><div class="stat-label">Satisfacción cliente</div><div class="stat-value">94%</div><div class="stat-change up">▲ 1.8% este trimestre</div></div>
+      </div>
+      <div class="grid-3-1">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Proyectos recientes</span><span class="card-action">Ver todos →</span></div>
+          <table><thead><tr><th>Proyecto</th><th>Cliente</th><th>Responsable</th><th>Estado</th><th>Vence</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Portal de pagos</strong></td><td>Fintech SA</td><td>Carlos M.</td><td><span class="badge badge-green">Activo</span></td><td style="color:var(--muted)">28 abr</td></tr>
+            <tr><td><strong>Rediseño CRM</strong></td><td>Logística Norte</td><td>María P.</td><td><span class="badge badge-amber">En revisión</span></td><td style="color:var(--muted)">15 may</td></tr>
+            <tr><td><strong>API v3 migración</strong></td><td>Interno</td><td>Luis R.</td><td><span class="badge badge-blue">Planificado</span></td><td style="color:var(--muted)">02 jun</td></tr>
+            <tr><td><strong>App móvil RRHH</strong></td><td>Grupo Aval</td><td>Sofía K.</td><td><span class="badge badge-green">Activo</span></td><td style="color:var(--muted)">10 may</td></tr>
+            <tr><td><strong>Módulo de reportes</strong></td><td>Constructora MX</td><td>Pedro L.</td><td><span class="badge badge-red">Retrasado</span></td><td style="color:var(--red)">08 abr</td></tr>
+          </tbody></table>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Actividad reciente</span></div>
+          <div class="activity-list">
+            <div class="activity-item"><div class="activity-dot" style="background:var(--green)"></div><div><div class="activity-text">Nuevo contrato firmado — Fintech SA</div><div class="activity-time">Hace 18 min</div></div></div>
+            <div class="activity-item"><div class="activity-dot" style="background:var(--accent)"></div><div><div class="activity-text">Carlos M. subió entregable #4</div><div class="activity-time">Hace 1 hora</div></div></div>
+            <div class="activity-item"><div class="activity-dot" style="background:var(--amber)"></div><div><div class="activity-text">Alerta: factura #2041 vence mañana</div><div class="activity-time">Hace 2 horas</div></div></div>
+            <div class="activity-item"><div class="activity-dot" style="background:var(--red)"></div><div><div class="activity-text">Proyecto "Reportes" marcado como retrasado</div><div class="activity-time">Hace 3 horas</div></div></div>
+            <div class="activity-item"><div class="activity-dot" style="background:var(--green)"></div><div><div class="activity-text">Sofía K. incorporada al equipo móvil</div><div class="activity-time">Ayer 16:42</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Ingresos por área — Abril</span></div>
+          <div class="chart-wrap">
+            <div class="chart-bar-row"><div class="chart-bar-label">Desarrollo</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:82%"></div></div><div class="chart-bar-val">$34.1k</div></div>
+            <div class="chart-bar-row"><div class="chart-bar-label">Consultoría</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:61%; background:var(--green)"></div></div><div class="chart-bar-val">$25.4k</div></div>
+            <div class="chart-bar-row"><div class="chart-bar-label">Soporte</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:40%; background:var(--amber)"></div></div><div class="chart-bar-val">$16.7k</div></div>
+            <div class="chart-bar-row"><div class="chart-bar-label">Licencias</div><div class="chart-bar-track"><div class="chart-bar-fill" style="width:19%; background:#a78bfa"></div></div><div class="chart-bar-val">$8.0k</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Progreso de proyectos clave</span></div>
+          <div class="progress-list">
+            <div class="progress-item"><div class="progress-meta"><span class="progress-name">Portal de pagos</span><span class="progress-pct">78%</span></div><div class="progress-track"><div class="progress-fill" style="width:78%; background:var(--accent)"></div></div></div>
+            <div class="progress-item"><div class="progress-meta"><span class="progress-name">App móvil RRHH</span><span class="progress-pct">55%</span></div><div class="progress-track"><div class="progress-fill" style="width:55%; background:var(--green)"></div></div></div>
+            <div class="progress-item"><div class="progress-meta"><span class="progress-name">Rediseño CRM</span><span class="progress-pct">91%</span></div><div class="progress-track"><div class="progress-fill" style="width:91%; background:var(--amber)"></div></div></div>
+            <div class="progress-item"><div class="progress-meta"><span class="progress-name">API v3 migración</span><span class="progress-pct">20%</span></div><div class="progress-track"><div class="progress-fill" style="width:20%; background:#a78bfa"></div></div></div>
+            <div class="progress-item"><div class="progress-meta"><span class="progress-name">Módulo de reportes</span><span class="progress-pct">43%</span></div><div class="progress-track"><div class="progress-fill" style="width:43%; background:var(--red)"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
